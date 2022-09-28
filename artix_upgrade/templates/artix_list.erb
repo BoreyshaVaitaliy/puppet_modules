@@ -1,0 +1,4 @@
+deb <% if @operatingsystemrelease == '14.04' %> <% else %>[arch=amd64] <% end %> <%= @repo %><% if @operatingsystemrelease == '14.04' %>/trusty<% else %>/bionic<% end %> artix-<%= @version %> <%= @components %>
+<% if @custom_enable == true  -%>
+deb <% if @operatingsystemrelease == '14.04' %> <% else %>[arch=amd64] <% end %><%= @custom_repo %><% if @operatingsystemrelease == '14.04' %>/trusty<% else %>/bionic<% end %> artix-<%= @version %> <%= @custom_components %>
+<% end -%>

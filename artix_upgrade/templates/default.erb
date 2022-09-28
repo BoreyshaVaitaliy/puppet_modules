@@ -1,0 +1,14 @@
+# GNU nano 2.2.2                                           Файл: /etc/default/puppet
+
+# Defaults for puppet - sourced by /etc/init.d/puppet
+
+# Start puppet on boot?
+<% if @run_as_service %>
+START=yes
+<% else %>
+START=no
+<% end -%>
+
+
+# Startup options
+DAEMON_OPTS=""

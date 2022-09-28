@@ -1,0 +1,40 @@
+#!/bin/bash
+
+HOMEDIR=/linuxcash/cash/data/upgrade-system
+STATUS_CODE=$HOMEDIR/status.code
+STATUS_TEXT=$HOMEDIR/status.text
+PKG_VERSION=$HOMEDIR/artix-packages.version
+PKG_INSTALL=$HOMEDIR/new-install
+PKG_INSTALL_LIST=$HOMEDIR/artix-packages.instlist
+PKG_DOWNLOAD=$HOMEDIR/downloaded
+PKG_UPGRADE_LOCK=$HOMEDIR/upgrade-locked
+PKG_INSTALL_LOCK=$HOMEDIR/install-locked
+
+function log_info() {
+    /bin/echo -e "***\n*** $(date +'%d.%m.%Y %H:%M:%S') [$$] - $*\n***"
+}
+
+function setstatus() {
+    CODE=
+    TEXT=
+    case "$1" in
+        NOTHING_TODO) CODE=12; TEXT="Уже установлена самая последняя версия" ;;
+        UPGRADE_INSTALLED) CODE=11 ; TEXT="Обновления установлены" ;;
+        UPGRADE_INSTALL) CODE=10 ; TEXT="Установка обновлений" ;;
+        UPGRADE_AVAILABLE_LOCK) CODE=9 ; TEXT="Обновления загружены, установка запрещена" ;;
+        UPGRADE_AVAILABLE) CODE=8 ; TEXT="Обновления загружены" ;;
+        UPGRADE_DOWNLOAD) CODE=7 ; TEXT="Загрузка обновлений" ;;
+        UPGRADE_WAIT) CODE=6; TEXT="Ожидание начала загрузки" ;;
+        UPGRADE_LOCKED) CODE=5 ; TEXT="Обновление заблокировано" ;;
+        INDEX_ERROR) CODE=4 ; TEXT="Ошибка обновления индексных файлов" ;;
+        DOWNLOAD_ERROR) CODE=3 ; TEXT="Ошибка загрузки обновлений" ;;
+        INSTALL_ERROR) CODE=2 ; TEXT="Ошибка установки обновлений" ;;
+        EXECUTE_ERROR) CODE=1 ; TEXT="Ошибка выполнения" ;;
+        *) CODE=0 ; TEXT="Не определено" ;;
+    esac
+    $SUDO /bin/rm -f $STATUS_CODE $STATUS_TEXT
+    $SUDO /bin/echo $CODE >$STATUS_CODE
+    $SUDO /bin/echo $TEXT >$STATUS_TEXT
+    log_info "Status: [$CODE] $TEXT"
+    [ "$2" = "EXIT" ] && exit 0 || $TRUE
+}

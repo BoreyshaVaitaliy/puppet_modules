@@ -1,0 +1,85 @@
+#!/bin/bash
+
+APTCOMMAND="/usr/bin/aptitude"
+APTARG="-y -o DPkg::Options::=--force-confold"
+DEBCONF_APT_PROGRESS=/usr/bin/debconf-apt-progress
+INFOCLIENT=/linuxcash/cash/bin/InfoClient
+
+AWK=/usr/bin/awk
+CAT=/bin/cat
+CHMOD=/bin/chmod
+DIALOG=/usr/bin/dialog
+DPKG=/usr/bin/dpkg
+ECHO=/bin/echo
+EGREP=/bin/egrep
+REBOOT=/sbin/reboot
+RM=/bin/rm
+SUDO='/usr/bin/sudo -E'
+SUDO_CMD='/usr/bin/sudo'
+TRUE=/bin/true
+WC=/usr/bin/wc
+
+TERM_OLD=$TERM
+TERM_UPGRADE=screen
+
+DEFINEFILE=/linuxcash/cash/bin/artix-upgrade.def
+LOGFILE=/linuxcash/logs/current/artix-upgrade.log
+REBOOT_FLAG=/var/run/reboot-required
+PUPPET_START=/linuxcash/cash/tools/tools_avail/puppet-start.sh
+PUPPET_LOG_FILE=/linuxcash/logs/current/puppet.log
+log_puppet () {
+    if [ $# -gt 0 ]; then
+        echo "$(date +"%F %X") - $@" >> $PUPPET_LOG_FILE
+    else 
+        while read data
+        do
+            echo "$(date +"%F %X") - $data" >> $PUPPET_LOG_FILE
+        done
+    fi
+}
+
+. $DEFINEFILE
+
+[ -f $LOGFILE ] && $SUDO $CHMOD a+w $LOGFILE
+
+UPGRADE_FINISHED=
+
+[ ! -e $PKG_DOWNLOAD ] && return 0
+[ -e $PKG_INSTALL_LOCK ] && setstatus UPGRADE_AVAILABLE_LOCK && return 0 || $TRUE
+
+log_info "Установка обновлений!" >>$LOGFILE
+setstatus UPGRADE_INSTALL
+export TERM=$TERM_UPGRADE
+
+PACKAGES=`$CAT $PKG_INSTALL_LIST`
+$SUDO $DEBCONF_APT_PROGRESS --logfile $LOGFILE -- $APTCOMMAND $APTARG install $PACKAGES && UPGRADE_FINISHED=YES || $TRUE
+
+if [ ! -z $UPGRADE_FINISHED ] ; then
+    setstatus UPGRADE_INSTALLED
+else
+    setstatus INSTALL_ERROR
+fi
+
+log_info "Выполняется конфигурирование" >>$LOGFILE
+$SUDO $DPKG --audit >>$LOGFILE 
+$SUDO $DPKG --configure -a >>$LOGFILE 
+$SUDO $RM -f $PKG_DOWNLOAD
+[ -x $INFOCLIENT ] && $INFOCLIENT --reset-alert >/dev/null 2>&1 || $TRUE
+
+log_info "Обновление завершено" >>$LOGFILE
+
+if [ -e $PUPPET_START ] ; then
+  log_info "Выполняется обращение к серверу конфигураций"
+  $PUPPET_START --immediate --sudo --verbose 2>&1 | log_puppet
+fi
+
+$SUDO aptitude clean >>$LOGFILE
+export TERM=$TERM_OLD
+if [ -e $REBOOT_FLAG ] ; then
+    log_info "Перезагрузка кассы" >>$LOGFILE
+    $DIALOG --backtitle "Процесс обновления завершен" --nocancel --pause "Касса будет перезагружена" 8 36 10
+    $SUDO $RM -f $REBOOT_FLAG
+    $SUDO_CMD $REBOOT
+    exit 0
+fi
+return 0

@@ -1,0 +1,41 @@
+[Properties]
+
+; брокер кассового сервера
+dept.broker.ip=127.0.0.1
+dept.broker.port=5672
+; Как часто проверять доступность соединения до сервера во время подключения и забора сообщений из очереди КС.
+; Значение параметра указывается в секундах. Если соединение потеряно, то подключение закроется и заблокированное.
+; (обрабатываемое) сообщение освободится и станет доступно для повторного считывания из очереди КС..
+; Если установлено значение 0, то доступность соединения проверяться не будет и подключение будет открыто, пока его
+; принудительно не закрыть.
+brokerconnectionheartbeat=0
+
+cash.code=1
+storeID=1
+
+; Режим sync-agent-a. Может быть 2 режима: cash и server
+mode = cash
+unloadScript = /linuxcash/cash/exchangesystems/exchangers/src/unload/service/cash/startReader.py
+
+; Использвать очередь при загрузке товаров. По умолчанию - использовать
+; Иначе данные записываются в БД.
+usequeueinupload = True
+; Скрипт для загрузки справочников напрямую в БД.
+; Работает, если useQueueInUpload = False
+uploadScript = /linuxcash/cash/exchangesystems/exchangers/src/upload/converter/aif.py
+
+maxcountbackupfiles=30
+actualcountdaysforbackupfiles=30
+cashServerRestPort = 8080
+
+; Настройки queueFileSize и queueFileCount задают размер и кол-во журналов для очередей.
+; Эти настройки ограничивают размер очереди: 65536 * queueFileSize * queueFileCount = queueSize (bytes)
+; Где queueSize - размер очереди в байтах. queueFileSize указывается в байтах.
+queuefilesize=128
+; При указании количества файлов необходимо учитывать, что qpid для каждой очереди постоянно держит все файлы открытыми.
+queuefilecount=16
+; Также размер очереди ограничивается параметром queueMaxSize. Размер указывается в байтах
+queuemaxsize=104857600
+; Максимальное количество сообщений в очереди.
+queuemaxcount=3000
+

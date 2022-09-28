@@ -1,0 +1,10 @@
+# Configuration file for artix-upgrade
+
+# The random sleep time in seconds. This is used to prevent clients from
+# accessing the APT sources all at the same time and overwhelming them.
+# Default is 360 minutes which means six hour.
+RUNSLEEP=<%= @run_sleep %>
+
+# To limit the bandwidth used use the following line. Default limit the
+# bandwidth usage to 25 kB/s.
+DOWNLOAD_LIMIT=<%= @dl_limit %>

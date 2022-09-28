@@ -1,0 +1,40 @@
+[main]
+logdir=/var/log/puppet
+vardir=/var/lib/puppet
+ssldir=/var/lib/puppet/ssl
+rundir=/var/run/puppet
+factpath=$vardir/lib/facter
+pluginsync=true
+#templatedir=$confdir/templates
+#prerun_command=/etc/puppet/etckeeper-commit-pre
+#postrun_command=/etc/puppet/etckeeper-commit-post
+<% if proxy_enable -%>
+http_proxy_host=<%= http_proxy_host %>
+http_proxy_port=<%= http_proxy_port %>
+<% end -%>
+
+[puppetd]
+runinterval = <%= runinterval %>
+<% if splay -%>
+splay = true
+splaylimit = <%= splaylimit %>
+<% else -%>
+splay = false
+<% end -%>
+report = true
+server = <%= server_name %>
+masterport = <%= masterport %>
+puppetdlockfile = /var/run/puppetdlock
+
+[agent]
+runinterval = <%= runinterval %>
+<% if splay -%>
+splay = true
+splaylimit = <%= splaylimit %>
+<% else -%>
+splay = false
+<% end -%>
+report = true
+server = <%= server_name %>
+masterport = <%= masterport %>
+puppetdlockfile = /var/run/puppetdlock

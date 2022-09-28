@@ -1,0 +1,5 @@
+#!/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/lib/sysstat
+PUPPETSTART=/linuxcash/cash/bin/puppet-start-after-boot.sh
+
+test -x $PUPPETSTART && setsid $PUPPETSTART >>/linuxcash/logs/current/puppet.log 2>&1 &
