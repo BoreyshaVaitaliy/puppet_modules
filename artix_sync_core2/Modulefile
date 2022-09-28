@@ -1,8 +1,0 @@
-name    'artix_sync_core2'
-version '0.1'
-author  'Yurii Anisimov'
-license 'Apache2'
-project_page 'http://www.artix.su'
-source  'svn://192.169.0.235/Puppet/master/modules/trunk/artix_cs20'
-summary 'Puppet module for Artix CashServer agent 2.x'
-description 'Puppet module for Artix CashServer agent 2.x'
