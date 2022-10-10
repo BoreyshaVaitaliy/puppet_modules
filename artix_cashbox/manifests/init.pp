@@ -28,7 +28,7 @@ class artix_cashbox (
             force        => true,
         }
     }
-	    file { '/linuxcash/cash/bin/cashboxreplace_v2.sh.sh' :
+	    file { '/linuxcash/cash/bin/cashboxreplace_v2.sh' :
         source  => "puppet:///files/${root_dir}/cashbox/cashboxreplace_v2.sh",
         replace => 'true',
         owner   => 'root',
